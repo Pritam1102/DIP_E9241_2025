@@ -1,0 +1,235 @@
+\documentclass[12 pt]{article}        	%sets the font to 12 pt and says this is an article (as opposed to book or other documents)
+\usepackage{amsfonts, amssymb, amsmath}					% packages to get the fonts, symbols used in most math
+
+%\usepackage{setspace} % Together with \doublespacing below allows for doublespacing of the document
+
+\oddsidemargin=-0.5cm                 	% These three commands create the margins required for class
+\setlength{\textwidth}{6.5in}         	%
+\addtolength{\voffset}{0pt}        		%
+\addtolength{\headsep}{0pt}           	%
+
+
+
+\pagestyle{myheadings}                           	% tells LaTeX to allow you to enter information in the heading
+\markright{Pritam Kumar \hfill \textbf{\fontsize{14pt}{10pt}\selectfont Lecture 8} \hfill}	
+
+
+\newcommand{\eqn}[0]{\begin{array}{rcl}}%begin an aligned equation - allows for aligning = or inequalities.  Always use with $$ $$
+\newcommand{\eqnend}[0]{\end{array} }  	%end the aligned equation
+
+\newcommand{\qed}[0]{$\square$}        	% make an unfilled square the default for ending a proof
+
+%\doublespacing                         	% Together with the package setspace above allows for doublespacing of the document
+
+\begin{document}												% end of preamble and beginning of text that will be printed
+
+\section{Spatial Smoothing Filters}
+Spatial smoothing filters are a concept in image processing used to reduce noise 
+and smooth out variations in an image by averaging or combining pixel values 
+in a local neighborhood.
+
+\vspace{4pt}
+\textbf{Types of Filters:}
+\begin{enumerate}
+    \item \textbf{Averaging Filter:} Replaces each pixel with the average of its neighbours.  
+    \[
+    \omega_1 = \frac{1}{9}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & 1 & 1 \\
+        1 & 1 & 1
+    \end{bmatrix}
+    \]
+
+    \item \textbf{Gaussian Filter:} Weights the neighbors according to a Gaussian distribution, 
+    giving higher weight to pixels closer to the center.  
+    \[
+    h(m,n) = K\, e^{-(m^2+n^2)}, \qquad m,n \in \{-1,0,1\}.
+    \]
+    K is chosen such that 
+    \[
+    \sum_{m,n}{h(m,n} = 1
+    \]
+    or
+    \[
+K=\left(\sum_{m=-1}^{1}\sum_{n=-1}^{1} e^{-(m^2+n^2)}\right)^{-1}.
+\]
+    
+    \item \textbf{Median Filter:} A nonlinear filter that replaces each pixel 
+    with the median of its neighborhood.  
+    Useful for removing \emph{salt-and-pepper noise}.
+
+    \item \textbf{Weighted Average Filter:} Similar to the averaging filter, 
+    but assigns more importance to the central pixel.  
+    Example:  
+    \[
+    \omega_3 = \frac{1}{10}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & 2 & 1 \\
+        1 & 1 & 1
+    \end{bmatrix}
+    \]
+\end{enumerate}
+
+\section{Applications of Spatial Smoothing Filters}
+Spatial smoothing filters are widely used in image processing tasks. 
+Some common applications include:
+\begin{enumerate}
+    \item \textbf{Denoising:} 
+    By averaging neighboring pixels, smoothing filters reduce the impact 
+    of random noise, making the image cleaner for further processing.
+
+    \item \textbf{Preprocessing before Binarization:} 
+    Smoothing helps suppress small intensity variations so that threshold-based 
+    binarization produces cleaner object boundaries.
+
+    \item \textbf{Edge Detection Preprocessing:} 
+    Many edge detection algorithms (such as Canny) first apply Gaussian smoothing 
+    to reduce noise. This ensures that false edges caused by random pixel fluctuations 
+    are minimized.
+
+    \item \textbf{Image Pyramid / Downsampling:} 
+    Before reducing image resolution, Gaussian smoothing is applied to avoid aliasing. 
+    This is a fundamental step in building image pyramids for multi-scale analysis 
+    (e.g., object detection and image compression).
+\end{enumerate}
+
+\section{Spatial Sharpening Filters}
+\[
+\frac{\partial f}{\partial x} = f(m+1,n) - f(m,n) = \nabla f_x(m,n) \rightarrow \textit{Image gradient in x-direction}
+\]
+\[
+\frac{\partial f}{\partial y} = f(m,n+1) - f(m,n)=\nabla f_y(m,n) \rightarrow \textit{Image gradient in y-direction}
+\]
+
+\[
+\frac{\partial^2 f}{\partial x^2} 
+\quad=\quad \frac{\partial}{\partial x}\!\left(\frac{\partial f}{\partial x}\right) 
+= (f(m+1,n) - f(m,n)) - (f(m,n) - f(m-1,n)) 
+\]
+\[
+\quad\quad= f(m+1,n) - 2f(m,n) + f(m-1,n)
+\]
+\[
+\frac{\partial^2 f}{\partial y^2} 
+\quad=\quad \frac{\partial}{\partial y}\!\left(\frac{\partial f}{\partial y}\right) 
+\quad=\quad  f(m,n+1) - 2f(m,n) + f(m,n-1)
+\]
+
+\section{Laplacian of an Image}
+The Laplacian is a second-order derivative operator that highlights regions of rapid intensity change in an image.
+It works by comparing a pixel’s value with its neighbors using convolution masks, making edges stand out while smooth regions stay near zero.
+At edges, it produces strong positive or negative responses, and zero-crossings indicate the actual edge locations.
+Because it amplifies rapid changes, the Laplacian is highly sensitive to noise.
+To reduce this effect, it is often combined with Gaussian smoothing, leading to the Laplacian of Gaussian (LoG) operator. The equation for the Laplacian is given by
+\[\nabla^2 f = \nabla^2 f_x + \nabla^2 f_y\]
+\[
+= \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}
+\]
+\[
+= f(m+1,n) + f(m-1,n) + f(m,n+1) + f(m,n-1) - 4f(m,n)
+\]
+\begin{itemize}
+    \item \textbf{$3 \times 3$ filter (Isotropic):}
+\[
+h(m,n) \quad=\quad 
+\begin{bmatrix}
+0 & 1 & 0 \\
+1 & -4 & 1 \\
+0 & 1 & 0
+\end{bmatrix}
+\]
+\item \textbf{Another variant:}
+\[
+h(m,n) \quad=\quad
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & -8 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+\quad\rightarrow\quad \textit{Smooth regions will have zero convolved value}
+\]
+\end{itemize}
+\subsection*{Application of Laplacian}
+\begin{itemize}
+    \item Highlight intensity discontinuity.
+    \item Deemphasize regions with slowly varying intensity levels. 
+\end{itemize}
+\subsection*{Image Sharpening using Laplacian Filters}
+\vspace{2pt}
+
+The sharpened image is given by:
+\[
+g(x,y) = f(x,y) + c \, \nabla^2 f(x,y)
+\]
+where $c = -1$ if the central coefficient of the Laplacian filter is negative.
+
+In terms of convolution:
+\[
+g(m,n) = f(m,n) + c \, [f(m,n) \ast h(m,n)]
+\]
+\[
+= f(m,n) + f(m,n) \ast h'(m,n)
+\]
+
+Expanding the discrete Laplacian:
+\[
+g(m,n) = f(m,n) + \Big[\,4f(m,n) - \big(f(m+1,n) + f(m-1,n) + f(m,n+1) + f(m,n-1)\big)\,\Big]
+\]
+
+\subsection*{Unsharp Masking and High-Boost Filtering}
+
+Let $\bar{f}(x,y)$ be a blurred (unsharp/smoothed) version of the original image $f(x,y)$.  
+
+\[
+g_{\text{mask}}(x,y) = f(x,y) - \bar{f}(x,y)
+\]
+
+The sharpened image is obtained as:  
+\[
+g(x,y) = f(x,y) + k \, g_{\text{mask}}(x,y)
+\]
+
+where  
+\[
+k = 1 \;\; \implies \;\; \text{Unsharp Masking (basic sharpening)}
+\]  
+\[
+k > 1 \;\; \implies \;\; \text{High-Boost Filtering (stronger sharpening effect)}
+\]
+
+\section{Geometric Operation}
+
+We have an input image $I(i,j)$ and the output image is defined as  
+\[
+J(i,j) = I(a_1(i,j), a_2(i,j)).
+\]
+
+\begin{itemize}
+    \item \textbf{Image Translation}\\
+    \[
+    a_1(i,j) = i - b_1, \quad a_2(i,j) = j - b_2
+    \]
+    \[
+    J(i,j) = I(i-b_1,\, j-b_2)
+    \]
+    For example, if $b_1 = b_2 = 2$:  
+    \[
+    J(2,2) = I(0,0), \quad J(0,0) = I(-2,-2) = 0 \quad \text{(outside image → 0)}.
+    \]
+
+    \item \textbf{Image Rotation}\\
+    A counter-clockwise rotation by angle $\theta$ is given by:
+    \[
+    a_1(i,j) = i\cos\theta - j\sin\theta
+    \]
+    \text{Rotation of axis in counter-clockwise direction}
+    \[
+    a_2(i,j) = i\sin\theta + j\cos\theta
+    \]
+\end{itemize}
+
+
+
+\end{document}
