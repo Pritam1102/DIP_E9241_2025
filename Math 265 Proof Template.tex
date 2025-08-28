@@ -1,0 +1,104 @@
+\documentclass[12 pt]{article}        	%sets the font to 12 pt and says this is an article (as opposed to book or other documents)
+\usepackage{amsfonts, amssymb, amsmath}					% packages to get the fonts, symbols used in most math
+
+%\usepackage{setspace} % Together with \doublespacing below allows for doublespacing of the document
+
+\oddsidemargin=-0.5cm                 	% These three commands create the margins required for class
+\setlength{\textwidth}{6.5in}         	%
+\addtolength{\voffset}{-20pt}        		%
+\addtolength{\headsep}{25pt}           	%
+
+
+
+\pagestyle{myheadings}                           	% tells LaTeX to allow you to enter information in the heading
+\markright{Pritam Kumar\hfill \today \hfill} 	
+
+
+\newcommand{\eqn}[0]{\begin{array}{rcl}}%begin an aligned equation - allows for aligning = or inequalities.  Always use with $$ $$
+\newcommand{\eqnend}[0]{\end{array} }  	%end the aligned equation
+
+\newcommand{\qed}[0]{$\square$}        	% make an unfilled square the default for ending a proof
+
+%\doublespacing                         	% Together with the package setspace above allows for doublespacing of the document
+
+\begin{document}												% end of preamble and beginning of text that will be printed
+
+\section{Spatial Smoothing Filters}
+Spatial smoothing filters are a concept in image processing used to reduce noise 
+and smooth out variations in an image by averaging or combining pixel values 
+in a local neighborhood.
+
+\vspace{4pt}
+\textbf{Types of Filters:}
+\begin{enumerate}
+    \item \textbf{Averaging Filter:} Replaces each pixel with the average of its neighbours.  
+    \[
+    \omega_1 = \frac{1}{9}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & 1 & 1 \\
+        1 & 1 & 1
+    \end{bmatrix}
+    \]
+
+    \item \textbf{Gaussian Filter:} Weights the neighbors according to a Gaussian distribution, 
+    giving higher weight to pixels closer to the center.  
+    \[
+    h(m,n) = K\, e^{-(m^2+n^2)}, \qquad m,n \in \{-1,0,1\}.
+    \]
+    K is chosen such that 
+    \[
+    \sum_{m,n}{h(m,n} = 1
+    \]
+    or
+    \[
+K=\left(\sum_{m=-1}^{1}\sum_{n=-1}^{1} e^{-(m^2+n^2)}\right)^{-1}.
+\]
+    
+    \item \textbf{Median Filter:} A nonlinear filter that replaces each pixel 
+    with the median of its neighborhood.  
+    Useful for removing \emph{salt-and-pepper noise}.
+
+    \item \textbf{Weighted Average Filter:} Similar to the averaging filter, 
+    but assigns more importance to the central pixel.  
+    Example:  
+    \[
+    \omega_3 = \frac{1}{10}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & 2 & 1 \\
+        1 & 1 & 1
+    \end{bmatrix}
+    \]
+\end{enumerate}
+
+\section{Applications of Spatial Smoothing Filters}
+Spatial smoothing filters are widely used in image processing tasks. 
+Some common applications include:
+\begin{enumerate}
+    \item \textbf{Denoising:} 
+    By averaging neighboring pixels, smoothing filters reduce the impact 
+    of random noise, making the image cleaner for further processing.
+
+    \item \textbf{Preprocessing before Binarization:} 
+    Smoothing helps suppress small intensity variations so that threshold-based 
+    binarization produces cleaner object boundaries.
+
+    \item \textbf{Edge Detection Preprocessing:} 
+    Many edge detection algorithms (such as Canny) first apply Gaussian smoothing 
+    to reduce noise. This ensures that false edges caused by random pixel fluctuations 
+    are minimized.
+
+    \item \textbf{Image Pyramid / Downsampling:} 
+    Before reducing image resolution, Gaussian smoothing is applied to avoid aliasing. 
+    This is a fundamental step in building image pyramids for multi-scale analysis 
+    (e.g., object detection and image compression).
+\end{enumerate}
+
+\section{Spatial Sharpening Filters}
+
+
+
+
+
+\end{document}
